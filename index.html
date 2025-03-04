@@ -2,42 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Barcode Attendance</title>
     <script src="https://unpkg.com/quagga"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        #scanner-container { 
-            width: 250px;  /* Smaller camera width */
-            height: 180px; /* Smaller camera height */
-            margin: 20px auto;
-            overflow: hidden; /* Prevents extra space */
-            border: 2px solid #000;
+        body { 
+            text-align: center; 
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
         }
-        #data { font-size: 18px; margin-top: 10px; font-weight: bold; }
+        #scanner-container { 
+            width: 90vw; /* Responsive width */
+            height: 250px; /* Adjusted height */
+            max-width: 400px; /* Prevents too large on tablets */
+            margin: 10px auto;
+            border: 2px solid #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #data { 
+            font-size: 18px; 
+            font-weight: bold; 
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
         button, input { 
-            margin: 10px; padding: 10px; font-size: 16px;
-            cursor: pointer; border-radius: 5px; border: none;
-            background-color: #007bff; color: white;
+            width: 90%;
+            max-width: 300px;
+            margin: 10px auto;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            display: block;
+            background-color: #007bff;
+            color: white;
         }
         button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
-    <h2>Barcode Attendance Scanner</h2>
-    
+    <h2>📷 Scan Barcode for Attendance</h2>
+
     <!-- Camera Scanner -->
     <div id="scanner-container"></div>
-    
+
     <!-- Display Scanned Data -->
     <p id="data">Scan a barcode...</p>
 
     <!-- Upload Excel File -->
     <input type="file" id="fileInput" accept=".xlsx" />
-    
+
     <!-- Download Updated File -->
-    <button onclick="downloadExcel()">Download Updated Sheet</button>
+    <button onclick="downloadExcel()">📥 Download Updated Sheet</button>
 
     <script>
         let workbook, sheet, sheetData = [];
@@ -62,7 +87,7 @@
             Quagga.init({
                 inputStream: {
                     type: "LiveStream",
-                    constraints: { facingMode: "environment", width: 250, height: 180 }, // Smaller camera feed
+                    constraints: { facingMode: "environment", width: 320, height: 240 },
                     target: document.querySelector("#scanner-container")
                 },
                 decoder: { readers: ["code_128_reader", "ean_reader", "upc_reader"] } // Barcode types
