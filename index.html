@@ -17,7 +17,7 @@
         #scanner-container { 
             width: 90vw; 
             max-width: 400px;
-            height: 280px; /* Optimized for better scanning */
+            height: 280px;
             margin: 10px auto;
             border: 2px solid #000;
             border-radius: 10px;
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h2>📷 Attendance using Barcode</h2>
+    <h2>📷 Scan Barcode for Attendance</h2>
 
     <!-- Camera Scanner -->
     <div id="scanner-container"></div>
@@ -113,7 +113,7 @@
                 Quagga.initialized = true;
                 Quagga.start();
             });
-            
+
             let scanTimeout; // To track timeout for resetting the display
 
             Quagga.onDetected(function(result) {
@@ -129,17 +129,16 @@
                     document.getElementById("roll-display").innerText = "Waiting for scan...";
                 }, 1500); // Reset message after 1.5 seconds
             });
-
-
+            
             // Quagga.onDetected(function(result) {
             //     let rollNo = result.codeResult.code;
             //     document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
-            //     markAttendance(rollNo);
+            //     markAttendance(rollNo, false); // false → Don't add new roll numbers from scanning
             // });
         }
 
         // Mark Attendance in Excel
-        function markAttendance(rollNo) {
+        function markAttendance(rollNo, allowAdd) {
             let found = false;
             for (let i = 1; i < sheetData.length; i++) { // Ignore header row
                 if (sheetData[i][0] == rollNo) { // Roll No. is in column A (index 0)
@@ -148,8 +147,12 @@
                     break;
                 }
             }
-            if (!found) {
-                alert("Roll No. " + rollNo + " not found in sheet!");
+            if (!found && allowAdd) {
+                // If Roll No. not found & manual entry is allowed, add it
+                sheetData.push([rollNo, "P"]);
+                alert("New Roll No. " + rollNo + " added and marked Present!");
+            } else if (!found) {
+                alert("Roll No. " + rollNo + " not found! Please enter manually.");
             }
         }
 
@@ -160,7 +163,7 @@
                 alert("Please enter a roll number!");
                 return;
             }
-            markAttendance(rollNo);
+            markAttendance(rollNo, true); // true → Allow adding new roll numbers from manual entry
             document.getElementById("manual-roll").value = ""; // Clear input field
         }
 
