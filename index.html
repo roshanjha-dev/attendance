@@ -137,9 +137,9 @@
             });
         }
 
-        // Mark Attendance in Excel
         function markAttendance(rollNo, allowAdd) {
             let found = false;
+            
             for (let i = 1; i < sheetData.length; i++) { // Ignore header row
                 if (sheetData[i][0] == rollNo) { // Roll No. is in column A (index 0)
                     sheetData[i][1] = "P"; // Mark Present in column B (index 1)
@@ -147,10 +147,15 @@
                     break;
                 }
             }
-            
+
             if (!found && allowAdd) {
-                // If Roll No. not found & manual entry is allowed, add it
+                // ✅ Add new Roll No. and Present status to the sheet
                 sheetData.push([rollNo, "P"]);
+                
+                // ✅ Update the workbook sheet
+                sheet = XLSX.utils.aoa_to_sheet(sheetData);
+                workbook.Sheets[workbook.SheetNames[0]] = sheet;
+
                 showStatusMessage(`New Roll No. ${rollNo} added & marked Present!`, "green");
             } else if (!found) {
                 showStatusMessage(`Roll No. ${rollNo} not found! Enter manually.`, "red");
@@ -175,9 +180,7 @@
                 alert("Please enter a roll number!");
                 return;
             }
-            sheetData.push([rollNo, "AP"]);
-            showStatusMessage(`New Roll No. ${rollNo} added & marked Present!`, "green");
-            // markAttendance(rollNo, true); // true → Allow adding new roll numbers from manual entry
+            markAttendance(rollNo, true); // true → Allow adding new roll numbers from manual entry
             document.getElementById("manual-roll").value = ""; // Clear input field
         }
 
