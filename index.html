@@ -10,29 +10,18 @@
         body { 
             text-align: center; 
             font-family: Arial, sans-serif;
+            background: #f8f9fa;
             margin: 0;
             padding: 0;
-            background: #f8f9fa;
         }
         #scanner-container { 
             width: 90vw; 
-            height: 250px; 
             max-width: 400px;
+            height: 280px; /* Adjusted for better scanning */
             margin: 10px auto;
             border: 2px solid #000;
             border-radius: 10px;
             overflow: hidden;
-        }
-        #data { 
-            font-size: 20px; 
-            font-weight: bold; 
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 10px;
-            min-width: 80px;
         }
         #roll-display {
             font-size: 22px;
@@ -68,6 +57,9 @@
     <!-- Upload Excel File -->
     <input type="file" id="fileInput" accept=".xlsx" />
 
+    <!-- Restart Scanner Button -->
+    <button onclick="startScanner()">🔄 Restart Scanner</button>
+
     <!-- Download Updated File -->
     <button onclick="downloadExcel()">📥 Download Updated Sheet</button>
 
@@ -89,20 +81,26 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // Initialize Scanner
+        // Start Scanner Function
         function startScanner() {
+            if (Quagga.initialized) {
+                Quagga.stop();
+            }
+
             Quagga.init({
                 inputStream: {
                     type: "LiveStream",
-                    constraints: { facingMode: "environment", width: 320, height: 240 },
+                    constraints: { facingMode: "environment", width: 640, height: 480 }, // Fixed dimensions
                     target: document.querySelector("#scanner-container")
                 },
                 decoder: { readers: ["code_128_reader", "ean_reader", "upc_reader"] } // Barcode types
             }, function(err) {
                 if (err) {
                     console.error(err);
+                    alert("Error starting scanner! Trying again...");
                     return;
                 }
+                Quagga.initialized = true;
                 Quagga.start();
             });
 
