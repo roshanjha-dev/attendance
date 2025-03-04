@@ -15,16 +15,16 @@
             background: #f8f9fa;
         }
         #scanner-container { 
-            width: 90vw; /* Responsive width */
-            height: 250px; /* Adjusted height */
-            max-width: 400px; /* Prevents too large on tablets */
+            width: 90vw; 
+            height: 250px; 
+            max-width: 400px;
             margin: 10px auto;
             border: 2px solid #000;
             border-radius: 10px;
             overflow: hidden;
         }
         #data { 
-            font-size: 18px; 
+            font-size: 20px; 
             font-weight: bold; 
             background: #000;
             color: #fff;
@@ -32,6 +32,13 @@
             border-radius: 5px;
             display: inline-block;
             margin-top: 10px;
+            min-width: 80px;
+        }
+        #roll-display {
+            font-size: 22px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 15px;
         }
         button, input { 
             width: 90%;
@@ -55,8 +62,8 @@
     <!-- Camera Scanner -->
     <div id="scanner-container"></div>
 
-    <!-- Display Scanned Data -->
-    <p id="data">Scan a barcode...</p>
+    <!-- Display Scanned Roll No -->
+    <p id="roll-display">Waiting for scan...</p>
 
     <!-- Upload Excel File -->
     <input type="file" id="fileInput" accept=".xlsx" />
@@ -101,7 +108,7 @@
 
             Quagga.onDetected(function(result) {
                 let rollNo = result.codeResult.code;
-                document.getElementById("data").innerText = "Scanned: " + rollNo;
+                document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
                 markAttendance(rollNo);
             });
         }
