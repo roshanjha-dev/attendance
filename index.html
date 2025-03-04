@@ -17,7 +17,7 @@
         #scanner-container { 
             width: 90vw; 
             max-width: 400px;
-            height: 280px; /* Adjusted for better scanning */
+            height: 280px; /* Optimized for better scanning */
             margin: 10px auto;
             border: 2px solid #000;
             border-radius: 10px;
@@ -39,10 +39,16 @@
             border-radius: 5px;
             border: none;
             display: block;
-            background-color: #007bff;
+        }
+        button { 
+            background-color: #007bff; 
             color: white;
         }
         button:hover { background-color: #0056b3; }
+        input { 
+            border: 1px solid #ccc; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +59,10 @@
 
     <!-- Display Scanned Roll No -->
     <p id="roll-display">Waiting for scan...</p>
+
+    <!-- Manual Input for Roll No -->
+    <input type="text" id="manual-roll" placeholder="Enter Roll No.">
+    <button onclick="markManualAttendance()">✅ Mark Present (Manual)</button>
 
     <!-- Upload Excel File -->
     <input type="file" id="fileInput" accept=".xlsx" />
@@ -124,6 +134,17 @@
             if (!found) {
                 alert("Roll No. " + rollNo + " not found in sheet!");
             }
+        }
+
+        // Manual Attendance Entry
+        function markManualAttendance() {
+            let rollNo = document.getElementById("manual-roll").value.trim();
+            if (rollNo === "") {
+                alert("Please enter a roll number!");
+                return;
+            }
+            markAttendance(rollNo);
+            document.getElementById("manual-roll").value = ""; // Clear input field
         }
 
         // Download Updated Excel File
