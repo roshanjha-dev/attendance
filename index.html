@@ -129,7 +129,7 @@
                     document.getElementById("roll-display").innerText = "Waiting for scan...";
                 }, 1500); // Reset message after 1.5 seconds
             });
-            
+
             // Quagga.onDetected(function(result) {
             //     let rollNo = result.codeResult.code;
             //     document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
@@ -138,6 +138,24 @@
         }
 
         // Mark Attendance in Excel
+        // function markAttendance(rollNo, allowAdd) {
+        //     let found = false;
+        //     for (let i = 1; i < sheetData.length; i++) { // Ignore header row
+        //         if (sheetData[i][0] == rollNo) { // Roll No. is in column A (index 0)
+        //             sheetData[i][1] = "P"; // Mark Present in column B (index 1)
+        //             found = true;
+        //             break;
+        //         }
+        //     }
+        //     if (!found && allowAdd) {
+        //         // If Roll No. not found & manual entry is allowed, add it
+        //         sheetData.push([rollNo, "AP"]);
+        //         alert("New Roll No. " + rollNo + " added and marked Present!");
+        //     } else if (!found) {
+        //         alert("Roll No. " + rollNo + " not found! Please enter manually.");
+        //     }
+        // }
+
         function markAttendance(rollNo, allowAdd) {
             let found = false;
             for (let i = 1; i < sheetData.length; i++) { // Ignore header row
@@ -147,13 +165,25 @@
                     break;
                 }
             }
+            
             if (!found && allowAdd) {
                 // If Roll No. not found & manual entry is allowed, add it
                 sheetData.push([rollNo, "P"]);
-                alert("New Roll No. " + rollNo + " added and marked Present!");
+                showStatusMessage(`New Roll No. ${rollNo} added & marked Present!`, "green");
             } else if (!found) {
-                alert("Roll No. " + rollNo + " not found! Please enter manually.");
+                showStatusMessage(`Roll No. ${rollNo} not found! Enter manually.`, "red");
+            } else {
+                showStatusMessage("Attendance Marked!", "green");
             }
+        }
+
+        // ✅ Function to show messages and reset after 2 seconds
+        function showStatusMessage(text, color) {
+            let message = document.getElementById("status-message");
+            message.innerText = text;
+            message.style.color = color;
+            
+            setTimeout(() => { message.innerText = ""; }, 2000);
         }
 
         // Manual Attendance Entry
