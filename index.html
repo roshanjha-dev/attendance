@@ -3,23 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Scanner to Excel</title>
+    <title>Barcode Attendance</title>
     <script src="https://unpkg.com/quagga"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
         #scanner-container { width: 100%; max-width: 400px; margin: 20px auto; }
         #data { font-size: 18px; margin-top: 10px; }
         button { margin: 10px; padding: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
-    <h2>Barcode Scanner</h2>
+    <h2>Barcode Attendance Scanner</h2>
     <div id="scanner-container"></div>
     <p id="data">Scan a barcode...</p>
-    <button onclick="downloadExcel()">Download Excel</button>
+    <input type="file" id="fileInput" accept=".xlsx" />
+    <button onclick="downloadExcel()">Download Updated Sheet</button>
 
     <script>
-        let scannedData = []; // Store scanned barcode data
+        let workbook, sheet, sheetData = [];
+
+        // Load Excel file
+        document.getElementById("fileInput").addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            let reader = new FileReader();
+            
+            reader.onload = function(e) {
+                let data = new Uint8Array(e.target.result);
+                workbook = XLSX.read(data, { type: "array" });
+                sheet = workbook.Sheets[workbook.SheetNames[0]];
+                sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert to array
+                console.log("Excel Loaded:", sheetData);
+            };
+            reader.readAsArrayBuffer(file);
+        });
 
         function startScanner() {
             Quagga.init({
@@ -38,21 +55,31 @@
             });
 
             Quagga.onDetected(function(result) {
-                let barcode = result.codeResult.code;
-                document.getElementById("data").innerText = "Scanned: " + barcode;
-
-                // Save to array (avoid duplicates)
-                if (!scannedData.includes(barcode)) {
-                    scannedData.push([barcode]); 
-                }
+                let rollNo = result.codeResult.code;
+                document.getElementById("data").innerText = "Scanned: " + rollNo;
+                markAttendance(rollNo);
             });
         }
 
+        function markAttendance(rollNo) {
+            let found = false;
+            for (let i = 1; i < sheetData.length; i++) { // Start from row 1 (ignore headers)
+                if (sheetData[i][0] == rollNo) { // Roll No. is in column A (index 0)
+                    sheetData[i][1] = "P"; // Mark Present in column B (index 1)
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                alert("Roll No. " + rollNo + " not found in sheet!");
+            }
+        }
+
         function downloadExcel() {
-            let ws = XLSX.utils.aoa_to_sheet([["Barcode Data"], ...scannedData]);
+            let ws = XLSX.utils.aoa_to_sheet(sheetData);
             let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Scanned Barcodes");
-            XLSX.writeFile(wb, "Scanned_Barcodes.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+            XLSX.writeFile(wb, "Updated_Attendance.xlsx");
         }
 
         startScanner(); // Start scanning on page load
