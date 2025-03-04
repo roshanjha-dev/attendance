@@ -150,7 +150,7 @@
             
             if (!found && allowAdd) {
                 // If Roll No. not found & manual entry is allowed, add it
-                sheetData.push([rollNo, "AP"]);
+                sheetData.push([rollNo, "P"]);
                 showStatusMessage(`New Roll No. ${rollNo} added & marked Present!`, "green");
             } else if (!found) {
                 showStatusMessage(`Roll No. ${rollNo} not found! Enter manually.`, "red");
@@ -175,7 +175,9 @@
                 alert("Please enter a roll number!");
                 return;
             }
-            markAttendance(rollNo, true); // true → Allow adding new roll numbers from manual entry
+            sheetData.push([rollNo, "AP"]);
+            showStatusMessage(`New Roll No. ${rollNo} added & marked Present!`, "green");
+            // markAttendance(rollNo, true); // true → Allow adding new roll numbers from manual entry
             document.getElementById("manual-roll").value = ""; // Clear input field
         }
 
