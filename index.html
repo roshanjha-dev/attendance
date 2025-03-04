@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h2>📷 Scan Barcode for Attendance</h2>
+    <h2>📷 Attendance using Barcode</h2>
 
     <!-- Camera Scanner -->
     <div id="scanner-container"></div>
@@ -113,12 +113,29 @@
                 Quagga.initialized = true;
                 Quagga.start();
             });
+            
+            let scanTimeout; // To track timeout for resetting the display
 
             Quagga.onDetected(function(result) {
                 let rollNo = result.codeResult.code;
                 document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
-                markAttendance(rollNo);
+
+                // Mark Attendance
+                markAttendance(rollNo, false);
+
+                // Clear previous timeout and set a new one to reset the display
+                clearTimeout(scanTimeout);
+                scanTimeout = setTimeout(() => {
+                    document.getElementById("roll-display").innerText = "Waiting for scan...";
+                }, 1500); // Reset message after 1.5 seconds
             });
+
+
+            // Quagga.onDetected(function(result) {
+            //     let rollNo = result.codeResult.code;
+            //     document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
+            //     markAttendance(rollNo);
+            // });
         }
 
         // Mark Attendance in Excel
