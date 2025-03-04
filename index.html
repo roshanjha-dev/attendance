@@ -29,6 +29,11 @@
             color: #007bff;
             margin-top: 15px;
         }
+        #status-message {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
         button, input { 
             width: 90%;
             max-width: 300px;
@@ -60,6 +65,9 @@
     <!-- Display Scanned Roll No -->
     <p id="roll-display">Waiting for scan...</p>
 
+    <!-- Status Message -->
+    <p id="status-message"></p>
+
     <!-- Manual Input for Roll No -->
     <input type="text" id="manual-roll" placeholder="Enter Roll No.">
     <button onclick="markManualAttendance()">✅ Mark Present (Manual)</button>
@@ -75,6 +83,7 @@
 
     <script>
         let workbook, sheet, sheetData = [];
+        let scanTimeout; // Timeout for resetting scan message
 
         // Load Excel File
         document.getElementById("fileInput").addEventListener("change", function(event) {
@@ -114,48 +123,21 @@
                 Quagga.start();
             });
 
-            let scanTimeout; // To track timeout for resetting the display
-
             Quagga.onDetected(function(result) {
                 let rollNo = result.codeResult.code;
-                document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
+                let rollDisplay = document.getElementById("roll-display");
 
-                // Mark Attendance
-                markAttendance(rollNo, false);
+                rollDisplay.innerText = "Scanned Roll No: " + rollNo;
+                markAttendance(rollNo, false); // false → Don't add new roll numbers from scanning
 
-                // Clear previous timeout and set a new one to reset the display
                 clearTimeout(scanTimeout);
                 scanTimeout = setTimeout(() => {
-                    document.getElementById("roll-display").innerText = "Waiting for scan...";
+                    rollDisplay.innerText = "Waiting for scan...";
                 }, 1500); // Reset message after 1.5 seconds
             });
-
-            // Quagga.onDetected(function(result) {
-            //     let rollNo = result.codeResult.code;
-            //     document.getElementById("roll-display").innerText = "Scanned Roll No: " + rollNo;
-            //     markAttendance(rollNo, false); // false → Don't add new roll numbers from scanning
-            // });
         }
 
         // Mark Attendance in Excel
-        // function markAttendance(rollNo, allowAdd) {
-        //     let found = false;
-        //     for (let i = 1; i < sheetData.length; i++) { // Ignore header row
-        //         if (sheetData[i][0] == rollNo) { // Roll No. is in column A (index 0)
-        //             sheetData[i][1] = "P"; // Mark Present in column B (index 1)
-        //             found = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!found && allowAdd) {
-        //         // If Roll No. not found & manual entry is allowed, add it
-        //         sheetData.push([rollNo, "AP"]);
-        //         alert("New Roll No. " + rollNo + " added and marked Present!");
-        //     } else if (!found) {
-        //         alert("Roll No. " + rollNo + " not found! Please enter manually.");
-        //     }
-        // }
-
         function markAttendance(rollNo, allowAdd) {
             let found = false;
             for (let i = 1; i < sheetData.length; i++) { // Ignore header row
